@@ -4,5 +4,9 @@ It detects common threats such as SQL injection, fuzzing vulnerabilities, and XX
 
 # Sequence Diagrams 
 Now the two main flows on this project are the following : 
+
 ![URL check](https://github.com/JosephEboue/scanWebsite/blob/DevYH/sequenceDiagrams/Sequance%20diagram%201%20.drawio.png)
+
+
+
 ![IP check](https://github.com/JosephEboue/scanWebsite/blob/DevYH/sequenceDiagrams/Sequance%20diagram%202.drawio.png)
