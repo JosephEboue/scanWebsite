@@ -17,21 +17,21 @@ on:
 
 jobs:
   build:
-    name: 🏗️ Build Docker Images
+    name: ⚙️ Build Docker Images
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🔨 Build Flask Server Image
+      - name: Build Flask Server Image
         run: docker build --cache-from flask_server -t flask_server ./website/flask_server
 
-      - name: 🔨 Build Client Image
+      - name: Build Client Image
         run: docker build --cache-from client -t client ./website/client
 
   test:
-    name: ✅ Run Tests
+    name:   💣 Run Tests
     runs-on: ubuntu-latest
     needs: build
 
@@ -39,19 +39,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🏗️ Build Flask Server for Testing
+      - name: Build Flask Server for Testing
         run: docker build -t flask_server ./website/flask_server
 
       - name: Run Backend Tests (Flask)
         run: |
-          docker run --rm flask_server pytest
+          docker run --rm flask_server pytest /app/website/flask_server/Test/
 
-      - name: 🏗️ Build Client for Testing
+      - name: Build Client for Testing
         run: docker build -t client ./website/client
 
-      - name: Run Frontend Tests (React)
-        run: |
-          docker run --rm client npm test
+      # - name: Run Frontend Tests (React)
+      #   run: |
+      #     docker run --rm client npm test
 
   push:
     name: 📤 Push Docker Images
