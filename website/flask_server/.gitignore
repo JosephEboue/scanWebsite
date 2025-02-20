@@ -1,16 +1,10 @@
-# Ignorer tous les répertoires 'venv' partout dans le projet
-*/venv/
-
-# Fichiers Python compilés
+__pycache__/
+venv/
+Test/
 *.pyc
 *.pyo
-*.pyd
-**/__pycache__/
-
-# Cache d'IDE
-.vscode/
-.idea/
-
-# Logs
 *.log
-
+.env
+.git
+.gitignore
+.idea
