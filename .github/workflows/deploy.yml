@@ -10,6 +10,8 @@ on:
         description: "Déploiement sur Play-With-Docker"
         required: false
         default: "false"
+env:
+  PLAYWD: ip172-18-0-21-cukjloi91nsg00dilh5g
 
 jobs:
   build:
@@ -106,7 +108,7 @@ jobs:
     
     environment:
       name: preProd
-      url: http://${{ secrets.PLAYWD }}-8080.direct.labs.play-with-docker.com  
+      url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com  
 
     steps:
       - name: Checkout Repository
@@ -121,7 +123,7 @@ jobs:
       # 🔌 Connexion à Play-With-Docker
       - name: 🔌 Connect to Play-With-Docker
         run: |
-          export DOCKER_HOST=tcp://${{ secrets.PLAYWD }}.direct.labs.play-with-docker.com:2375
+          export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
           docker info  
 
       # 📦 Déployer l'application sur Play-With-Docker
