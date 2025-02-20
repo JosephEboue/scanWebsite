@@ -10,18 +10,10 @@ function App() {
   function onSubmit(url: string, scanType: string, fuzzParam?: string) {
     setLoading(true);
 
-    var formData = {};
-
-    //if (scanType === 'fuzz' || scanType === 'all') {
-    formData = {
+    const formData = {
       url: url,
       fuzzParam: fuzzParam,
     };
-    /*} else {
-      formData = {
-        url: url,
-      };
-    }*/
 
     fetch(`http://localhost:5000/${scanType}`, {
       method: "POST",
@@ -34,21 +26,45 @@ function App() {
       .then((data) => {
         console.log("Success:", data);
 
-        // Format the result object into a readable string
-        const formattedResult = Object.entries(data.result)
-          .map(([key, value]) => `${key}: ${value}`)
-          .join("\n"); // Join each entry with a newline
+        let formattedResult = "";
+        const result = data.result;
+
+        if (result.hasOwnProperty("IP Scan")) {
+          // 🟢 Formatting IP Scan results
+          const ipScan = result["IP Scan"];
+          formattedResult = `
+            📌 **IP Scan Results**:
+            - IP Address: ${ipScan.ipAddress}
+            - Domain: ${ipScan.domain}
+            - Country: ${ipScan.countryName}
+            - Abuse Score: ${ipScan.abuseConfidenceScore}%
+            - Reports: ${ipScan.totalReports}
+            - Last Reported: ${ipScan.lastReportedAt}
+            - Whitelisted: ${ipScan.isWhitelisted ? "✅ Yes" : "❌ No"}
+          `;
+        } else {
+          // 🔵 Formatting URL vulnerability scan results
+          formattedResult = Object.entries(result)
+            .map(([key, value]) => `- **${key}**: ${value}`)
+            .join("\n");
+        }
 
         swal({
-          title: "Scan completed!",
-          text: formattedResult, // Now properly formatted
+          title: "Scan Completed!",
+          text: formattedResult,
           icon: "success",
           buttons: ["OK", "Cancel"],
           dangerMode: false,
         });
       })
-
-      .catch((error) => console.error("Error sending POST request:", error))
+      .catch((error) => {
+        console.error("Error sending POST request:", error);
+        swal({
+          title: "Error!",
+          text: "Failed to complete the scan.",
+          icon: "error",
+        });
+      })
       .finally(() => {
         setLoading(false);
       });
@@ -66,7 +82,7 @@ function App() {
               height={"10%"}
               width={"10%"}
             />
-            <div className="absolute inset-0  bg-black opacity-20 z-10"></div>
+            <div className="absolute inset-0 bg-black opacity-20 z-10"></div>
           </div>
         )}
         <div className="my-24 w-1/4 relative z-0">

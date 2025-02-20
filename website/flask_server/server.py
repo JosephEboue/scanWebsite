@@ -1,16 +1,17 @@
+import re
 import threading
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
-import re
+from dotenv import load_dotenv
 from WebsiteScanner.IpScanner import IpClass
 from WebsiteScanner.XxeScanner import XxeVulnerabilityScanner
 from WebsiteScanner.FuzzScanner import Fuzzer
 from WebsiteScanner.SqlScanner import SQLScanner
-from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
+
 # Define payload file paths
 WEBSITE_SCANNER_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 PAYLOADS_FILE_PATH = os.path.join(WEBSITE_SCANNER_DIRECTORY, 'WebsiteScanner/payloads.txt')
@@ -25,97 +26,50 @@ URL_PATTERN = re.compile(
     r'(:\d{1,5})?'  
     r'(/.*)?$' 
 )
+
+# IP validation regex pattern
+IP_PATTERN = re.compile(
+    r'^(?:\d{1,3}\.){3}\d{1,3}$'  # Matches IPv4 addresses
+)
+
 def is_valid_url(url):
-    #Validate if the given URL is properly formatted
+    """ Validate if the given URL is properly formatted """
     return bool(URL_PATTERN.match(url))
+
+def is_valid_ip(ip):
+    """ Check if the input is a valid IP address """
+    return bool(IP_PATTERN.match(ip))
+
 def url_client_error(url):
+    """ Validate URL input """
     if not url or not is_valid_url(url):
         return jsonify({"error": "Invalid URL provided"}), 400
-    
-@app.route('/')
-def hello_world():
-    return 'Backend server is running'
-
-@app.route('/scan-ip', methods=['POST'])
-def ip_scan():
-    try:
-        data = request.json
-        ip_address = data.get('ip_address')
-        if not ip_address:
-            return jsonify({"error": "IP address is required"}), 400
-        
-         # Utiliser la classe IpScanner pour vérifier l'IP
-        ip_data = IpClass.check_ip(ip_address, ABUSE_IPDB_API_KEY)
-
-        if "error" in ip_data:
-            return jsonify(ip_data), 500
-
-        # Extraire et retourner les données pertinentes
-        parsed_data = IpClass.parse_ip_data(ip_data)
-        return jsonify(parsed_data), 200
-
-    except Exception as e:
-        app.logger.error(f"Error in IP scan: {str(e)}")
-        return jsonify({"error": str(e)}), 500
-
-
-@app.route('/xxe-scan', methods=['POST'])
-def xxe_scan():
-    try:
-        data = request.json
-        url = data.get('url')
-        url_client_error(url)
-        xxe_scanner = XxeVulnerabilityScanner(url)
-        result = xxe_scanner.scan_xxe_vulnerability()
-        return jsonify({"result": result}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/fuzz', methods=['POST'])
-def fuzz_scan():
-    try:
-        data = request.json
-        url = data.get('url')
-        fuzz_param = data.get('fuzz_param')
-        url_client_error(url)
-        if not fuzz_param:
-            return jsonify({"error": "Missing fuzz parameter"}), 400
-
-        fuzzer_scanner = Fuzzer(url, fuzz_param)
-        result = fuzzer_scanner.simple_fuzz()
-        return jsonify({"result": result}), 200
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/sql-injection-scan', methods=['POST'])
-def sqli_scan():
-    try:
-        data = request.json
-        url = data.get('url')
-        url_client_error(url)
-        result = SQLScanner.sql_injection_scan(url, payload_file=PAYLOADS_FILE_PATH)
-        return jsonify({"result": result}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500    
 
 @app.route('/all-scan', methods=['POST'])
 def all_scan():
     try:
         data = request.json
         url = data.get('url')
-        url_client_error(url)
         fuzz_param = data.get('fuzz_param')
-        # Run all scans asynchronously
+
+        # Check if input is an IP address
+        is_ip = is_valid_ip(url)
+
+        # If it's neither a valid URL nor a valid IP, return an error
+        if not is_ip and not is_valid_url(url):
+            return jsonify({"error": "Invalid URL or IP address provided"}), 400
+
         results = {}
-        # Pour assurer l'accès thread-safe à results
         lock = threading.Lock()
+
         def run_xxe():
+            """ Run XXE Scan only for URLs """
             xxe_scanner = XxeVulnerabilityScanner(url)
             with lock:
                 results["XXE Scan"] = xxe_scanner.scan_xxe_vulnerability()
 
         def run_fuzz():
+            """ Run Fuzzing Scan """
             with lock:
                 if fuzz_param:
                     fuzzer_scanner = Fuzzer(url, fuzz_param)
@@ -124,20 +78,34 @@ def all_scan():
                     results["Fuzz Scan"] = "No fuzz parameter provided"
 
         def run_sqli():
+            """ Run SQL Injection Scan """
             with lock:
                 results["SQL Injection Scan"] = SQLScanner.sql_injection_scan(url, payload_file=PAYLOADS_FILE_PATH)
 
-        # Create threads for parallel execution
+        def run_ip_scan():
+            """ Run IP Scan if input is an IP address """
+            ip_data = IpClass.check_ip(url, ABUSE_IPDB_API_KEY)
+            with lock:
+                if "error" in ip_data:
+                    results["IP Scan"] = ip_data
+                else:
+                    results["IP Scan"] = IpClass.parse_ip_data(ip_data)
+
+        # Create a list of scan threads
         threads = [
-            threading.Thread(target=run_xxe),
             threading.Thread(target=run_fuzz),
             threading.Thread(target=run_sqli),
         ]
 
-        # Start threads
+        if is_ip:
+            threads.append(threading.Thread(target=run_ip_scan))  # Run IP scan if input is an IP
+        else:
+            threads.append(threading.Thread(target=run_xxe))  # Run XXE scan only if input is a URL
+
+        # Start and join threads
         for thread in threads:
             thread.start()
-        # Wait for all threads to finish
+
         for thread in threads:
             thread.join()
 
@@ -145,7 +113,7 @@ def all_scan():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
