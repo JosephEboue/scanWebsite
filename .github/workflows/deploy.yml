@@ -1,45 +1,118 @@
-name: Build and Push Docker Image
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+
+  # workflow_dispatch:
+  #   inputs:
+  #     deploy_prod:
+  #       description: "Déployer en production sur Play-With-Docker"
+  #       required: false
+  #       default: "false"
+
+# env:
+#   PLAYWD: ip172-18-0-21-cukjloi91nsg00dilh5g
 
 jobs:
   build:
+    name: 🏗️ Build Docker Images
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
 
-      # Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      - name: 🔨 Build Flask Server Image
+        run: docker build --cache-from flask_server -t flask_server ./website/flask_server
 
-      # Log in to Docker Hub (ajuste si tu utilises un autre registre comme GitHub Packages)
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
+      - name: 🔨 Build Client Image
+        run: docker build --cache-from client -t client ./website/client
+
+  test:
+    name: ✅ Run Tests
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Build Flask Server for Testing
+        run: docker build -t flask_server ./website/flask_server
+
+      - name: Run Backend Tests (Flask)
+        run: |
+          docker run --rm flask_server pytest
+
+      - name: 🏗️ Build Client for Testing
+        run: docker build -t client ./website/client
+
+      - name: Run Frontend Tests (React)
+        run: |
+          docker run --rm client npm test
+
+  push:
+    name: 📤 Push Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🔐 Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build the Docker image
-      - name: Build Docker image
+      - name: 🏷️ Tag & Push Flask Server
         run: |
-          docker build --no-cache -t flask_server .
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          docker tag flask_server ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
 
-      # Test the Flask application in Docker container
-      - name: Test Flask application
+      - name: 🏷️ Tag & Push Client
         run: |
-          docker run --rm flask_server python -m flask --version
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
 
-      # Push the image to Docker Hub (optionnel, selon ton besoin)
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker tag flask_server ${{ secrets.DOCKER_USERNAME }}/flask_server:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/flask_server:latest
+  # deploy_horsProd:
+  #   name: 🚀 Deploy to Coolify
+  #   runs-on: ubuntu-latest
+  #   needs: push
+
+  #   steps:
+  #     - name: Trigger Deployment on Coolify
+  #       run: curl -X POST ${{ secrets.COOLIFY_DEPLOY_HOOK }}
+
+  # deploy_prod:
+  #   name: 🚀 Deploy to Play-With-Docker (Manual)
+  #   runs-on: ubuntu-latest
+  #   needs: push
+  #   if: github.event.inputs.deploy_prod == 'true'
+  #   environment:
+  #     name: prod
+  #     url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com
+
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v4
+
+  #     - name: 🛠️ Install Docker CLI & Docker Compose
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y docker-compose
+
+  #     - name: 🔌 Connect to Play-With-Docker
+  #       run: |
+  #         export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
+
+  #     - name: 📦 Deploy Application
+  #       run: |
+  #         docker compose down
+  #         docker compose pull
+  #         docker compose up -d
