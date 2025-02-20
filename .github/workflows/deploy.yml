@@ -44,7 +44,7 @@ jobs:
 
       - name: Run Backend Tests (Flask)
         run: |
-          docker run --rm flask_server pytest ./website/flask_server/Test/
+          docker run --rm flask_server pytest /app/Test/
 
       - name: Build Client for Testing
         run: docker build -t client ./website/client
