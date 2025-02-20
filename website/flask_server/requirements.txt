@@ -22,3 +22,4 @@ pyyaml
 
 # Tests
 pytest==8.0.0
+pytest-mock==3.11.0
