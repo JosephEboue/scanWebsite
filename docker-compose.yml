@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   flask_server:
-    build: 
-      context: ./website/flask_server
-      dockerfile: Dockerfile
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}  # Utilise l'image de Docker Hub
     container_name: flask_server
     environment:
       - FLASK_APP=server.py
@@ -13,18 +11,28 @@ services:
       - "5000:5000"
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
 
   client:
-    build:
-      context: ./website/client
-      dockerfile: Dockerfile
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}  # Utilise l'image de Docker Hub
     container_name: client
     ports:
-      - "8080:80"
+      - "8080:80"  
     depends_on:
       - flask_server
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      retries: 3
+      start_period: 10s
+      timeout: 10s
 
 networks:
   app_network:
