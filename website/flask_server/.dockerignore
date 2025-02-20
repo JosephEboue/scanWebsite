@@ -1,0 +1,17 @@
+# Ignorer les fichiers compilés Python
+*.pyc
+*.pyo
+
+# Ignorer les répertoires de tests
+#Test/
+
+# Ignorer les fichiers de configuration locaux
+#*.env
+*.git
+
+# Ignorer les répertoires de cache
+__pycache__
+.cache
+
+# Ignorer les fichiers de logs
+#*.log

@@ -1,6 +1,6 @@
 __pycache__/
 venv/
-Test/
+#Test/
 *.pyc
 *.pyo
 *.log
