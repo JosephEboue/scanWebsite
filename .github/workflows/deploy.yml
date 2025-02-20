@@ -10,6 +10,7 @@ on:
         description: "Déploiement sur Play-With-Docker"
         required: false
         default: "false"
+
 env:
   PLAYWD: ip172-18-0-48-curq718l2o9000fvu30g
 
@@ -103,10 +104,8 @@ jobs:
   deploy_prod:
     name: 🚀 Deploy to Play-With-Docker (Manual)
     runs-on: ubuntu-latest
-    needs: ci_cd
+    needs: push
     if: github.event.inputs.deploy_prod == 'true'
-    environment:
-      url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com
 
     steps:
       - name: Checkout Repository
