@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      deploy_prod:
+        description: "Déploiement sur Play-With-Docker"
+        required: false
+        default: "false"
+env:
+  PLAYWD: ip172-18-0-48-curq718l2o9000fvu30g
 
 jobs:
   build:
@@ -91,3 +99,33 @@ jobs:
           COMMIT_HASH=$(git rev-parse --short HEAD)
           docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
+
+  deploy_prod:
+    name: 🚀 Deploy to Play-With-Docker (Manual)
+    runs-on: ubuntu-latest
+    needs: ci_cd
+    if: github.event.inputs.deploy_prod == 'true'
+    environment:
+      url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 🛠️ Installer Docker CLI et Docker Compose
+      - name: 🛠️ Install Docker CLI & Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
+      # 🔌 Connexion à Play-With-Docker
+      - name: 🔌 Connect to Play-With-Docker
+        run: |
+          export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
+
+      # 📦 Déployer l'application sur Play-With-Docker
+      - name: 📦 Deploy Application
+        run: |
+          docker compose down
+          docker compose pull
+          docker compose up -d
