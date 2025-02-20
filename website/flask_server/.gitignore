@@ -8,4 +8,4 @@ Test/
 .git
 .gitignore
 .idea
-.dockerignore
+#.dockerignore
