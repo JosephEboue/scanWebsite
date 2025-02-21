@@ -91,14 +91,14 @@ jobs:
       - name: 🏷️ Tag & Push Flask Server
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker tag flask_server ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$github.sha
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$github.sha
+          docker tag flask_server ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}
 
       - name: 🏷️ Tag & Push Client
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$github.sha
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$github.sha
+          docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}
 
   deploy:
     name: 🚀 Deploy
