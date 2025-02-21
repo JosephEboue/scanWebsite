@@ -9,7 +9,7 @@ describe("Authentication Flow", () => {
       cy.get('input[placeholder="http://localhost:8080/"]').type('http://netflx-actualizar.com/');
       cy.get('input[id="fuzz-param"]').type("' OR '1'='1' -- ");
       cy.contains("Scan site for vulnerabilities").click();
-      cy.wait(1000);
+      cy.wait(3000);
     });
 
     it("should write inputs with Ip", () => {
