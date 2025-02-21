@@ -9,6 +9,7 @@ function MainForm({ onSubmit }: Props) {
   const [url, setUrl] = useState('');
   const [fuzzParam, setFuzzParam] = useState('');
 
+  var isHidden = true;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -32,20 +33,21 @@ function MainForm({ onSubmit }: Props) {
         />
       </div>
 
-
+      {!isHidden && (
         <div>
-          <div className="mb-2 block">
+          <div className="mb-2 block" hidden={true}>
             <Label htmlFor="fuzz-param" value="fuzz parameter" />
           </div>
           <TextInput
             id="fuzz-param"
             type="text"
-            required
+            //required
             shadow
             value={fuzzParam}
             onChange={(e) => setFuzzParam(e.target.value)}
           />
         </div>
+        )}
 
       <Button className='bg-[#38B6FF]' type="submit">Scan site for vulnerabilities</Button>
     </form>
