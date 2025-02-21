@@ -1,5 +1,5 @@
 describe("Authentication Flow", () => {
-    const rootpage = "http://127.0.0.1:5173/";
+    const rootpage = "http://localhost:5173/";
   
   
     it("should write inputs with Url", () => {

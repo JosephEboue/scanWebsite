@@ -98,3 +98,12 @@ Run this command in the frontend **website/client**
 ```artillery run test.yml```
 
 [text](sequenceDiagrams) ![text](<sequenceDiagrams/charge test.png>)
+
+
+## End to end test (Cypress):
+
+Run this command in the frontend **website/client**
+
+```npm run cypress:open```
+
+[text](sequenceDiagrams) ![text](<sequenceDiagrams/charge test.png>)
