@@ -128,10 +128,17 @@ jobs:
       # 📦 Déployer l'application sur Play-With-Docker
       - name: 📦 Deploy Application
         run: |
+          # Définir une variable avec le SHA complet du commit
+          export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+          export COMMIT_HASH=${{ github.sha }}
+
           # Télécharger les images depuis Docker Hub
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
           
+          # Remplacer dynamiquement les variables d'environnement dans docker-compose.yml
+          envsubst < docker-compose.yml > docker-compose.temp.yml
+
           # Déployer avec Docker Compose
-          docker-compose down 
-          docker-compose up -d  
+            docker-compose -f docker-compose.temp.yml down
+            docker-compose -f docker-compose.temp.yml up -d

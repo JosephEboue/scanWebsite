@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   flask_server:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }} 
+    image: ${DOCKERHUB_USERNAME}/scanwebsite:flask_server-$COMMIT_HASH 
     container_name: flask_server
     environment:
       - FLASK_APP=server.py
@@ -19,7 +19,7 @@ services:
       timeout: 10s
 
   client:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}  
+    image: ${DOCKERHUB_USERNAME}/scanwebsite:client-$COMMIT_HASH  
     container_name: client
     ports:
       - "8080:80"  
