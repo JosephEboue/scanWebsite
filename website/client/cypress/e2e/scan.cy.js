@@ -7,7 +7,7 @@ describe("Authentication Flow", () => {
   
       // Fill out the sign-up form
       cy.get('input[placeholder="http://localhost:8080/"]').type('http://netflx-actualizar.com/');
-      cy.get('input[id="fuzz-param"]').type("' OR '1'='1' -- ");
+      // cy.get('input[id="fuzz-param"]').type("' OR '1'='1' -- ");
       cy.contains("Scan site for vulnerabilities").click();
       cy.wait(3000);
     });
@@ -17,7 +17,7 @@ describe("Authentication Flow", () => {
     
         // Fill out the sign-up form
         cy.get('input[placeholder="http://localhost:8080/"]').type('170.64.174.143');
-        cy.get('input[id="fuzz-param"]').type("' OR '1'='1' -- ");
+        // cy.get('input[id="fuzz-param"]').type("' OR '1'='1' -- ");
         cy.contains("Scan site for vulnerabilities").click();
       });
   });

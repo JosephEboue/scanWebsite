@@ -106,4 +106,6 @@ Run this command in the frontend **website/client**
 
 ```npm run cypress:open```
 
-[text](sequenceDiagrams) ![text](<sequenceDiagrams/charge test.png>)
+[text](README.md) ![text](sequenceDiagrams/cypress1.png)
+![alt text](sequenceDiagrams/cypress2.png)
+![alt text](sequenceDiagrams/cypress3.png)
