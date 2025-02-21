@@ -2,7 +2,6 @@ version: "3.8"
 
 services:
   flask_server:
-    context: ./website/flask_server
     image: ${DOCKERHUB_USERNAME}/scanwebsite:flask_server-${COMMIT_HASH}
     # build:
     #   context: ./website/flask_server
@@ -18,7 +17,6 @@ services:
       - app_network
 
   client:
-    context: ./website/client
     image: ${DOCKERHUB_USERNAME}/scanwebsite:client-${COMMIT_HASH}
     # build:
     #   context: ./website/client
