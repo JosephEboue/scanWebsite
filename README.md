@@ -2,6 +2,16 @@
 This project helps users assess the safety of a URL or IP address by scanning them with multiple security services. 
 It detects common threats such as SQL injection, fuzzing vulnerabilities, and XXE attacks. The results are presented in a user-friendly interface, providing an insightful report on potential risks associated with the source.
 
+# Installation
+### Frontend
+```cd website/client```  
+```npm install```  
+```npm run dev```  
+
+### Backend
+```cd website/flask_server```  
+```python server.py``` 
+
 # Sequence Diagrams 
 Now the two main flows on this project are the following : 
 
