@@ -120,21 +120,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose 
       
-      # 🔌 Connexion à Play-With-Docker
-      - name: 🔌 Connect to Play-With-Docker
-        run: |
-          export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
-
-      # 📦 Déployer l'application sur Play-With-Docker
-      - name: 📦 Deploy Application
+      # 🔌 Connexion et déploiment sur Play-With-Docker
+      - name: 🔌 Connect & Deploy 📦
         run: |
           # Définir une variable avec le SHA complet du commit
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           export COMMIT_HASH=${{ github.sha }}
 
-          # Télécharger les images depuis Docker Hub
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
+          export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
+          docker info
           
           # Remplacer dynamiquement les variables d'environnement dans docker-compose.yml
           envsubst < docker-compose.yml > docker-compose.temp.yml
