@@ -4,17 +4,17 @@ import Nav from "./components/Nav";
 import swal from "sweetalert";
 import ReactLoading from "react-loading";
 
-const API_BASE_URL =import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:5000";
+const API_BASE_URL =import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 function App() {
   const [loading, setLoading] = useState(false);
 
-  function onSubmit(url: string, scanType: string, fuzz_param?: string) {
+  function onSubmit(url: string, scanType: string, fuzzParam?: string) {
     setLoading(true);
 
     const formData = {
       url: url,
-      fuzz_param: fuzz_param,
+      fuzz_param: fuzzParam,
     };
 
     fetch(`${API_BASE_URL}/${scanType}`, {

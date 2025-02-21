@@ -11,7 +11,7 @@ on:
   #       required: fals
   #       default: "false"
 env:
-  PLAYWD: ip172-18-0-72-cus40kiim2rg00dce7t0
+  PLAYWD: ip172-18-0-20-cus7h7qim2rg00c6tjm0
 
 jobs:
   build:
