@@ -108,7 +108,7 @@ jobs:
     
     environment:
       name: preprod
-      url: http://${{ secrets.PLAYWD }}-8080.direct.labs.play-with-docker.com
+      url: http://${PLAYWD}-8080.direct.labs.play-with-docker.com
 
     steps:
       - name: Checkout Repository
@@ -123,7 +123,7 @@ jobs:
       # Remplacement dynamique de PLAYWD dans .env.preprod
       - name: 🔄 Remplacement dynamique de PLAYWD dans .env.preprod
         run: |
-          sed -i "s|${PLAYWD}|${{ secrets.PLAYWD }}|g" website/client/.env.preprod
+          sed -i "s|${PLAYWD}|${PLAYWD}|g" website/client/.env.preprod
           echo "🔍 Vérification du fichier après modification:"
           cat website/client/.env.preprod
 
@@ -134,7 +134,7 @@ jobs:
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           export COMMIT_HASH=${{ github.sha }}
 
-          export DOCKER_HOST=tcp://${{ secrets.PLAYWD }}.direct.labs.play-with-docker.com:2375
+          export DOCKER_HOST=tcp://${PLAYWD}.direct.labs.play-with-docker.com:2375
           docker info
           
           # Remplacer dynamiquement les variables d'environnement dans docker-compose.yml
