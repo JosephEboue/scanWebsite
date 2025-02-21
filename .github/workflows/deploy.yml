@@ -107,19 +107,26 @@ jobs:
     #if: github.event.inputs.deploy_prod == 'true' 
     
     environment:
-      name: preProd
-      url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com  
+      name: preprod
+      url: 
+          http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com # Frontend (client)
+          http://${{ env.PLAYWD }}-5000.direct.labs.play-with-docker.com # Backend (Flask)
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4  # Récupération du code source
-
+        
       # 🛠️ Installer Docker CLI et Docker Compose
       - name: 🛠️ Install Docker CLI & Docker Compose
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-compose 
-      
+
+      # Remplacement dynamique de PLAYWD dans .env.preprod
+      - name: 🔄 Remplacement dynamique de PLAYWD dans .env.preprod
+        run: |
+          sed -i "s|${PLAYWD}|${{ env.PLAYWD }}|g" website/client/.env.preprod
+
       # 🔌 Connexion et déploiment sur Play-With-Docker
       - name: 🔌 Connect & Deploy 📦
         run: |

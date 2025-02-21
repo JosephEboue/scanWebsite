@@ -3,12 +3,15 @@ version: "3.8"
 services:
   flask_server:
     image: ${DOCKERHUB_USERNAME}/scanwebsite:flask_server-${COMMIT_HASH}
+    # build:
+    #   context: ./website/flask_server
+    #   dockerfile: Dockerfile
     container_name: flask_server
     mem_limit: 512M
     environment:
       - FLASK_APP=server.py
-      - FLASK_ENV=production
-    # entrypoint: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+      - FLASK_ENV=preprod
+    #entrypoint: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
     ports:
       - "5000:5000"
     networks:
@@ -16,12 +19,16 @@ services:
 
   client:
     image: ${DOCKERHUB_USERNAME}/scanwebsite:client-${COMMIT_HASH}
+    # build:
+    #   context: ./website/client
+    #   dockerfile: Dockerfile
     container_name: client
-    mem_limit: 512M
+    environment:
+        - VITE_API_BASE_URL=http://${PLAYWD}-5000.direct.labs.play-with-docker.com
     # On remplace l'entrypoint pour faire un check sur le serveur Flask avant de démarrer NGINX
-    entrypoint: >
-      sh -c "until nc -z flask_server 5000; do echo waiting for flask_server; sleep 2; done;
-      nginx -g 'daemon off;'"
+    # entrypoint: >
+    #   sh -c "until nc -z flask_server 5000; do echo waiting for flask_server; sleep 2; done;
+    #   nginx -g 'daemon off;'"
     ports:
       - "8080:80"
     depends_on:

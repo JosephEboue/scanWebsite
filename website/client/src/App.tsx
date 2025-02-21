@@ -4,6 +4,8 @@ import Nav from "./components/Nav";
 import swal from "sweetalert";
 import ReactLoading from "react-loading";
 
+const API_BASE_URL =import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 function App() {
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +17,7 @@ function App() {
       fuzz_param: fuzzParam,
     };
 
-    fetch(`http://localhost:5000/${scanType}`, {
+    fetch(`${API_BASE_URL}/${scanType}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
