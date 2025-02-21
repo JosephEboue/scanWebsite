@@ -124,19 +124,13 @@ jobs:
       - name: 🔌 Connect to Play-With-Docker
         run: |
           export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
-        
-      - name: 🔐 Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # 📦 Déployer l'application sur Play-With-Docker
       - name: 📦 Deploy Application
         run: |
           # Télécharger les images depuis Docker Hub
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ $COMMIT_HASH }}
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ $COMMIT_HASH }}
           
           # Déployer avec Docker Compose
           docker-compose down 
