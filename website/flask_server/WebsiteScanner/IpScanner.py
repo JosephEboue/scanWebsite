@@ -12,9 +12,11 @@ class IpClass:
         }
         params = {
             'ipAddress': ip_address,
+            'verbose': True,
             'maxAgeInDays': 90  
         }
 
+        print("apiKey:",api_key)
         try:
             # Envoyer la requête à AbuseIPDB
             response = requests.get(url, headers=headers, params=params)
