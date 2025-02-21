@@ -11,7 +11,7 @@ on:
         required: false
         default: "false"
 env:
-  PLAYWD: ip172-18-0-21-cukjloi91nsg00dilh5g
+  PLAYWD: ip172-18-0-38-curro82im2rg00bi4b1g
 
 jobs:
   build:
@@ -101,7 +101,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
 
   deploy:
-    name: 🚀 Deploy to Play-With-Docker (Staging)
+    name: 🚀 Deploy to Play-With-Docker
     runs-on: ubuntu-latest
     needs: push
     if: github.event.inputs.deploy_prod == 'true' 
@@ -124,7 +124,6 @@ jobs:
       - name: 🔌 Connect to Play-With-Docker
         run: |
           export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
-          docker info  
 
       # 📦 Déployer l'application sur Play-With-Docker
       - name: 📦 Deploy Application
