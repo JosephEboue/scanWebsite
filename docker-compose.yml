@@ -2,22 +2,23 @@ version: "3.8"
 
 services:
   flask_server:
+    context: ./website/flask_server
     image: ${DOCKERHUB_USERNAME}/scanwebsite:flask_server-${COMMIT_HASH}
     # build:
     #   context: ./website/flask_server
     #   dockerfile: Dockerfile
     container_name: flask_server
-    mem_limit: 512M
     environment:
       - FLASK_APP=server.py
       - FLASK_ENV=preprod
-    #entrypoint: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
+    entrypoint: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
     ports:
       - "5000:5000"
     networks:
       - app_network
 
   client:
+    context: ./website/client
     image: ${DOCKERHUB_USERNAME}/scanwebsite:client-${COMMIT_HASH}
     # build:
     #   context: ./website/client

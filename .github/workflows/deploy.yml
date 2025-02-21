@@ -10,8 +10,8 @@ on:
   #       description: "Déploiement sur Play-With-Docker"
   #       required: fals
   #       default: "false"
-env:
-  PLAYWD: ip172-18-0-72-cus40kiim2rg00dce7t0
+# env:
+#   PLAYWD: ip172-18-0-72-cus40kiim2rg00dce7t0
 
 jobs:
   build:
@@ -108,7 +108,7 @@ jobs:
     
     environment:
       name: preprod
-      url: http://${{ env.PLAYWD }}-8080.direct.labs.play-with-docker.com
+      url: http://${{ secrets.PLAYWD }}-8080.direct.labs.play-with-docker.com
 
     steps:
       - name: Checkout Repository
@@ -123,7 +123,9 @@ jobs:
       # Remplacement dynamique de PLAYWD dans .env.preprod
       - name: 🔄 Remplacement dynamique de PLAYWD dans .env.preprod
         run: |
-          sed -i "s|${PLAYWD}|${{ env.PLAYWD }}|g" website/client/.env.preprod
+          sed -i "s|${PLAYWD}|${{ secrets.PLAYWD }}|g" website/client/.env.preprod
+          echo "🔍 Vérification du fichier après modification:"
+          cat website/client/.env.preprod
 
       # 🔌 Connexion et déploiment sur Play-With-Docker
       - name: 🔌 Connect & Deploy 📦
@@ -132,7 +134,7 @@ jobs:
           export DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           export COMMIT_HASH=${{ github.sha }}
 
-          export DOCKER_HOST=tcp://${{ env.PLAYWD }}.direct.labs.play-with-docker.com:2375
+          export DOCKER_HOST=tcp://${{ secrets.PLAYWD }}.direct.labs.play-with-docker.com:2375
           docker info
           
           # Remplacer dynamiquement les variables d'environnement dans docker-compose.yml
