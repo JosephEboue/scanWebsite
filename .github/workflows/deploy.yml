@@ -91,14 +91,14 @@ jobs:
       - name: 🏷️ Tag & Push Flask Server
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker tag flask_server ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$COMMIT_HASH
+          docker tag flask_server ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$github.sha
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-$github.sha
 
       - name: 🏷️ Tag & Push Client
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
-          docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$COMMIT_HASH
+          docker tag client ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$github.sha
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-$github.sha
 
   deploy:
     name: 🚀 Deploy
@@ -129,8 +129,8 @@ jobs:
       - name: 📦 Deploy Application
         run: |
           # Télécharger les images depuis Docker Hub
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ $COMMIT_HASH }}
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ $COMMIT_HASH }}
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:flask_server-${{ github.sha }}
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/scanwebsite:client-${{ github.sha }}
           
           # Déployer avec Docker Compose
           docker-compose down 
