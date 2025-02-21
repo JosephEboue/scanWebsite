@@ -11,7 +11,7 @@ on:
   #       required: fals
   #       default: "false"
 env:
-  PLAYWD: ip172-18-0-38-curro82im2rg00bi4b1g
+  PLAYWD: ip172-18-0-33-curro82im2rg00bi4b1g
 
 jobs:
   build:

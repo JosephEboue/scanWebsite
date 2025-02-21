@@ -9,7 +9,7 @@ services:
       - FLASK_ENV=production
     # L'entrypoint attend que le service 'client' soit prêt avant de démarrer Flask
     entrypoint: >
-      sh -c "until nc -z client 80; do echo waiting for client; sleep 2; done;
+      sh -c "until nc -z client 8080; do echo waiting for client; sleep 2; done;
       flask run --host=0.0.0.0 --port=5000"
     ports:
       - "5000:5000"
@@ -23,7 +23,7 @@ services:
       sh -c "until nc -z flask_server 5000; do echo waiting for flask_server; sleep 2; done;
       nginx -g 'daemon off;'"
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
       - flask_server
     networks:
