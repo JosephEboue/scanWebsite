@@ -129,6 +129,14 @@ jobs:
           fi
           echo "Valeur de PLAYWD: ${PLAYWD}"
 
+      - name: 🔄 Remplacement dynamique de PLAYWD dans .env.preprod
+        run: |
+          # Utiliser un autre délimiteur (#) pour éviter les conflits
+          echo "Remplacement de PLAYWD dans .env.preprod"
+          sed -i "s#${PLAYWD}#${PLAYWD}#g" website/client/.env.preprod
+          echo "🔍 Vérification du fichier après modification:"
+          cat website/client/.env.preprod
+
 
       # 🔌 Connexion et déploiment sur Play-With-Docker
       - name: 🔌 Connect & Deploy 📦
