@@ -121,11 +121,14 @@ jobs:
           sudo apt-get install -y docker-compose 
 
       # Remplacement dynamique de PLAYWD dans .env.preprod
-      - name: 🔄 Remplacement dynamique de PLAYWD dans .env.preprod
+      - name: Vérifier la valeur de PLAYWD
         run: |
-          sed -i "s|${PLAYWD}|${PLAYWD}|g" website/client/.env.preprod
-          echo "🔍 Vérification du fichier après modification:"
-          cat website/client/.env.preprod
+          if [ -z "$PLAYWD" ]; then
+            echo "Erreur : la variable PLAYWD est vide ou non définie"
+            exit 1
+          fi
+          echo "Valeur de PLAYWD: ${PLAYWD}"
+
 
       # 🔌 Connexion et déploiment sur Play-With-Docker
       - name: 🔌 Connect & Deploy 📦
