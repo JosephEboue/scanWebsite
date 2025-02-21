@@ -11,5 +11,5 @@ RUN npm run build
 # Étape 2 : Servir avec NGINX
 FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 8080
+EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

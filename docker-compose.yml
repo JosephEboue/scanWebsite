@@ -4,13 +4,11 @@ services:
   flask_server:
     image: ${DOCKERHUB_USERNAME}/scanwebsite:flask_server-${COMMIT_HASH}
     container_name: flask_server
+    mem_limit: 512M
     environment:
       - FLASK_APP=server.py
       - FLASK_ENV=production
-    # L'entrypoint attend que le service 'client' soit prêt avant de démarrer Flask
-    entrypoint: >
-      sh -c "until nc -z client 8080; do echo waiting for client; sleep 2; done;
-      flask run --host=0.0.0.0 --port=5000"
+    # entrypoint: ["flask", "run", "--host=0.0.0.0", "--port=5000"]
     ports:
       - "5000:5000"
     networks:
@@ -19,11 +17,13 @@ services:
   client:
     image: ${DOCKERHUB_USERNAME}/scanwebsite:client-${COMMIT_HASH}
     container_name: client
+    mem_limit: 512M
+    # On remplace l'entrypoint pour faire un check sur le serveur Flask avant de démarrer NGINX
     entrypoint: >
       sh -c "until nc -z flask_server 5000; do echo waiting for flask_server; sleep 2; done;
       nginx -g 'daemon off;'"
     ports:
-      - "8080:8080"
+      - "8080:80"
     depends_on:
       - flask_server
     networks:
