@@ -91,3 +91,10 @@ Now the two main flows on this project are the following :
 - Returns a risk summary (e.g., "Possible SQL Injection detected", "IP reported as malicious", etc.).
 
 
+## Charge test:
+
+Run this command in the frontend **website/client**
+
+```artillery run test.yml```
+
+[text](sequenceDiagrams) ![text](<sequenceDiagrams/charge test.png>)
