@@ -12,7 +12,7 @@ function App() {
 
     const formData = {
       url: url,
-      fuzzParam: fuzzParam,
+      fuzz_param: fuzzParam,
     };
 
     fetch(`http://localhost:5000/${scanType}`, {
